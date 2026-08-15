@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Sparkles, Eye, EyeOff, Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
 import { Button } from '../components/common/Button';
 import { Input } from '../components/common/Input';
+import { PwaInstallButton } from '../components/pwa/PwaInstallButton';
 import toast from 'react-hot-toast';
 
 export const Login: React.FC = () => {
@@ -77,6 +78,9 @@ export const Login: React.FC = () => {
           <p className="text-xs font-medium tracking-wide uppercase text-emerald-400">
             Admin Panel Access
           </p>
+          <div className="flex justify-center pt-2">
+            <PwaInstallButton />
+          </div>
         </div>
 
         {error && (
