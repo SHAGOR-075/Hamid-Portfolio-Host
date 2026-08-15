@@ -413,7 +413,7 @@ const initialSettingsData = {
     footerName: 'Abdul Hamid Khokon',
     footerDescription: 'Designing robust AI workflows and digital systems.',
     copyrightText: '© 2026 Abdul Hamid Khokon. All rights reserved.',
-    previewUrl: '',
+    previewUrl: 'http://hamidkhokon.sites.bd',
 };
 const initialActivitiesData = [
     {
