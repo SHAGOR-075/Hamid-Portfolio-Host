@@ -12,9 +12,9 @@ export default defineConfig(() => {
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: [
+          'favicon.svg',
           'favicon-32x32.png',
           'apple-touch-icon.png',
-          'icon.svg',
         ],
         manifest: {
           name: 'Portfolio Admin Panel',

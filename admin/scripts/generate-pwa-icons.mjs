@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, '..', 'public');
-const svg = readFileSync(join(publicDir, 'icon.svg'));
+const svg = readFileSync(join(publicDir, 'favicon.svg'));
 
 const sizes = [
   { name: 'pwa-192x192.png', size: 192 },
