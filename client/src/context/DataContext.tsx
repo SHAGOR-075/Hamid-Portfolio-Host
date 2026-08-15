@@ -5,7 +5,7 @@ import { educationData as defaultEducation, mlProjectsData as defaultProjects } 
 import { travelData as defaultTravel } from '../data/travelData';
 import { SkillItem, EducationItem, MLProjectItem, TravelDestination } from '../types';
 
-const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL || 'https://hamid-portfolio-backend.vercel.app/api';
 
 interface DataContextType {
   profile: typeof defaultProfile;

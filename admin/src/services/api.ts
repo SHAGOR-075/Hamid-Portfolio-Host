@@ -3,7 +3,7 @@ import { storage } from './storage';
 
 // Base Axios instance ready for live REST API connection
 export const api: AxiosInstance = axios.create({
-  baseURL: (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:5000/api',
+  baseURL: (import.meta as any).env?.VITE_API_BASE_URL || 'https://hamid-portfolio-backend.vercel.app/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

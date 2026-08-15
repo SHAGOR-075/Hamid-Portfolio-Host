@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const handlePreview = () => {
-    window.open(settings.previewUrl || 'https://abdulhamid.dev', '_blank', 'noopener,noreferrer');
+    window.open(settings.previewUrl || (import.meta as any).env?.VITE_PREVIEW_URL || 'https://hamid-portfolio-host.vercel.app', '_blank', 'noopener,noreferrer');
   };
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>

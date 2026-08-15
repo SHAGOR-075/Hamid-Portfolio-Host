@@ -46,8 +46,10 @@ export const Contact: React.FC = () => {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
 
+    const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL || 'https://hamid-portfolio-backend.vercel.app/api';
+
     try {
-      await fetch('http://localhost:5000/api/contact/messages', {
+      await fetch(`${API_BASE}/contact/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
