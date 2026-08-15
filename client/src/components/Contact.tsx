@@ -5,7 +5,6 @@ import confetti from 'canvas-confetti';
 import { 
   Mail, 
   MapPin, 
-  Phone, 
   Send, 
   Copy, 
   Check, 
@@ -16,7 +15,8 @@ import {
 } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 import { SocialLinks } from './SocialLinks';
-import { profileData } from '../data/portfolioData';
+import { useData } from '../context/DataContext';
+import { buildWhatsAppUrl } from '../utils/whatsapp';
 
 interface ContactFormData {
   name: string;
@@ -26,6 +26,7 @@ interface ContactFormData {
 }
 
 export const Contact: React.FC = () => {
+  const { profile } = useData();
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,10 +41,15 @@ export const Contact: React.FC = () => {
   } = useForm<ContactFormData>();
 
   const copyEmailToClipboard = () => {
-    navigator.clipboard.writeText(profileData.email);
+    navigator.clipboard.writeText(profile.email);
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2500);
   };
+
+  const whatsappUrl = buildWhatsAppUrl(
+    profile.phone || '',
+    `Hi ${profile.fullName}, I found your portfolio and would like to connect.`
+  );
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
@@ -132,7 +138,7 @@ export const Contact: React.FC = () => {
                   <div className="min-w-0">
                     <p className="text-[11px] font-mono text-neutral-400 uppercase tracking-wider">Email Address</p>
                     <p className="text-sm font-semibold text-white dark:text-white light:text-neutral-900 truncate">
-                      {profileData.email}
+                      {profile.email}
                     </p>
                   </div>
                 </div>
@@ -148,6 +154,32 @@ export const Contact: React.FC = () => {
                 </button>
               </div>
 
+              {/* WhatsApp Card */}
+              {profile.phone && whatsappUrl && (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-4 rounded-2xl bg-neutral-900/60 dark:bg-[#0B0F0D] light:bg-white border border-neutral-800/80 dark:border-neutral-800/80 light:border-neutral-200 flex items-center justify-between group hover:border-emerald-500/40 transition-colors shadow-sm"
+                  aria-label="Open WhatsApp chat"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                      <MessageSquare size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-mono text-neutral-400 uppercase tracking-wider">WhatsApp</p>
+                      <p className="text-sm font-semibold text-white dark:text-white light:text-neutral-900 truncate">
+                        {profile.phone}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[11px] font-bold text-emerald-400 group-hover:text-emerald-300 shrink-0">
+                    Chat Now
+                  </span>
+                </a>
+              )}
+
               {/* Location Card */}
               <div className="p-4 rounded-2xl bg-neutral-900/60 dark:bg-[#0B0F0D] light:bg-white border border-neutral-800/80 dark:border-neutral-800/80 light:border-neutral-200 flex items-center gap-3.5 shadow-sm">
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
@@ -156,7 +188,7 @@ export const Contact: React.FC = () => {
                 <div>
                   <p className="text-[11px] font-mono text-neutral-400 uppercase tracking-wider">Location</p>
                   <p className="text-sm font-semibold text-white dark:text-white light:text-neutral-900">
-                    {profileData.cityCountry} (GMT+6)
+                    {profile.cityCountry} (GMT+6)
                   </p>
                 </div>
               </div>
@@ -169,7 +201,7 @@ export const Contact: React.FC = () => {
                 <div>
                   <p className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider font-bold">Status</p>
                   <p className="text-xs text-neutral-200 font-medium mt-0.5">
-                    {profileData.availability}
+                    {profile.availability}
                   </p>
                 </div>
               </div>

@@ -12,6 +12,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
+import { buildWhatsAppUrl } from '../utils/whatsapp';
 
 interface ResumeModalProps {
   isOpen: boolean;
@@ -27,11 +28,10 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => 
     window.print();
   };
 
-  // WhatsApp Link generator
-  const rawPhone = profileData.phone || '+8801700000000';
-  const cleanPhone = rawPhone.replace(/[^0-9]/g, '');
-  const whatsappMsg = encodeURIComponent(`Hi ${profileData.fullName}, I would like to request your official Resume / CV.`);
-  const whatsappUrl = `https://wa.me/${cleanPhone}?text=${whatsappMsg}`;
+  const whatsappUrl = buildWhatsAppUrl(
+    profileData.phone || '8801400212184',
+    `Hi ${profileData.fullName}, I would like to request your official Resume / CV.`
+  );
 
   const handleGoToContact = () => {
     onClose();
