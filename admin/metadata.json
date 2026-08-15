@@ -1,0 +1,6 @@
+{
+  "name": "Portfolio Admin Panel",
+  "description": "Professional SaaS CMS and Admin Dashboard for managing portfolio content, projects, skills, education, travel journal, socials, and settings.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
