@@ -9,7 +9,7 @@ export const profileData: ProfileData = {
   badge: "CSE GRADUATE • MACHINE LEARNING ENTHUSIAST",
   location: "Dhaka, Bangladesh",
   cityCountry: "Dhaka, Bangladesh",
-  email: "abdulhamid.cse@gmail.com",
+  email: "hamidkhokon8@gmail.com",
   phone: "+880 1700-000000",
   availability: "Available for full-time engineering & ML opportunities",
   bio: {

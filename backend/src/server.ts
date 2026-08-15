@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import { connectDB } from './config/db';
+import { connectDB, getDbStatus } from './config/db';
 import { getEmailConfigStatus } from './utils/sendEmail';
 import { notFound, errorHandler } from './middleware/error';
 import { User } from './models/User';
@@ -28,8 +28,42 @@ dotenv.config();
 
 const app: Application = express();
 
-// Middleware to ensure DB connection on serverless environments (Vercel)
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN,
+  process.env.ADMIN_ORIGIN,
+  'https://hamidkhokon.sites.bd',
+  'https://hamid-portfolio-admin.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
+].filter(Boolean) as string[];
+
+// CORS first so failed DB/API responses still include ACAO headers
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(null, true);
+    },
+    credentials: true,
+  })
+);
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(helmet({ crossOriginResourcePolicy: false }));
+
+// Ensure MongoDB is connected before API handlers run (Vercel serverless)
 app.use(async (req: Request, res: Response, next: NextFunction) => {
+  if (req.path === '/api/health' || req.path === '/' || req.path === '/api') {
+    next();
+    return;
+  }
+
   try {
     await connectDB();
     next();
@@ -37,17 +71,6 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 });
-
-// Middlewares
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(
-  cors({
-    origin: true, // Allow dynamic origins (http://localhost:5173, Vercel deployments, etc.)
-    credentials: true,
-  })
-);
-app.use(helmet({ crossOriginResourcePolicy: false }));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -71,13 +94,29 @@ app.get('/api', (req: Request, res: Response) => {
   });
 });
 
-// Health check route
-app.get('/api/health', (req: Request, res: Response) => {
+// Health check route (does not require DB so deployment diagnostics stay available)
+app.get('/api/health', async (req: Request, res: Response) => {
+  let dbError: string | undefined;
+
+  try {
+    await connectDB();
+  } catch (error) {
+    dbError = (error as Error).message;
+  }
+
+  const database = getDbStatus();
+
   res.json({
-    status: 'OK',
+    status: database.connected ? 'OK' : 'DEGRADED',
     message: 'Abdul Hamid Khokon Portfolio REST API Server Running',
     timestamp: new Date().toISOString(),
+    database: dbError ? { ...database, error: dbError } : database,
     email: getEmailConfigStatus(),
+    env: {
+      hasMongoUri: Boolean(process.env.MONGODB_URI),
+      nodeEnv: process.env.NODE_ENV || 'development',
+      vercel: Boolean(process.env.VERCEL),
+    },
   });
 });
 

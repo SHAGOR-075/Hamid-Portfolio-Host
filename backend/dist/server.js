@@ -29,8 +29,36 @@ const seedRoutes_1 = __importDefault(require("./routes/seedRoutes"));
 const backupRoutes_1 = __importDefault(require("./routes/backupRoutes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-// Middleware to ensure DB connection on serverless environments (Vercel)
+const allowedOrigins = [
+    process.env.CLIENT_ORIGIN,
+    process.env.ADMIN_ORIGIN,
+    'https://hamidkhokon.sites.bd',
+    'https://hamid-portfolio-admin.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+].filter(Boolean);
+// CORS first so failed DB/API responses still include ACAO headers
+app.use((0, cors_1.default)({
+    origin(origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+            return;
+        }
+        callback(null, true);
+    },
+    credentials: true,
+}));
+app.use(express_1.default.json({ limit: '10mb' }));
+app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
+app.use((0, helmet_1.default)({ crossOriginResourcePolicy: false }));
+// Ensure MongoDB is connected before API handlers run (Vercel serverless)
 app.use(async (req, res, next) => {
+    if (req.path === '/api/health' || req.path === '/' || req.path === '/api') {
+        next();
+        return;
+    }
     try {
         await (0, db_1.connectDB)();
         next();
@@ -39,14 +67,6 @@ app.use(async (req, res, next) => {
         next(error);
     }
 });
-// Middlewares
-app.use(express_1.default.json({ limit: '10mb' }));
-app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
-app.use((0, cors_1.default)({
-    origin: true, // Allow dynamic origins (http://localhost:5173, Vercel deployments, etc.)
-    credentials: true,
-}));
-app.use((0, helmet_1.default)({ crossOriginResourcePolicy: false }));
 if (process.env.NODE_ENV === 'development') {
     app.use((0, morgan_1.default)('dev'));
 }
@@ -66,13 +86,27 @@ app.get('/api', (req, res) => {
         timestamp: new Date().toISOString(),
     });
 });
-// Health check route
-app.get('/api/health', (req, res) => {
+// Health check route (does not require DB so deployment diagnostics stay available)
+app.get('/api/health', async (req, res) => {
+    let dbError;
+    try {
+        await (0, db_1.connectDB)();
+    }
+    catch (error) {
+        dbError = error.message;
+    }
+    const database = (0, db_1.getDbStatus)();
     res.json({
-        status: 'OK',
+        status: database.connected ? 'OK' : 'DEGRADED',
         message: 'Abdul Hamid Khokon Portfolio REST API Server Running',
         timestamp: new Date().toISOString(),
+        database: dbError ? { ...database, error: dbError } : database,
         email: (0, sendEmail_1.getEmailConfigStatus)(),
+        env: {
+            hasMongoUri: Boolean(process.env.MONGODB_URI),
+            nodeEnv: process.env.NODE_ENV || 'development',
+            vercel: Boolean(process.env.VERCEL),
+        },
     });
 });
 // API Routes

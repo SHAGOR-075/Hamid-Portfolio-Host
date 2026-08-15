@@ -1,27 +1,83 @@
 import mongoose from 'mongoose';
 import dns from 'dns';
 
-// Force Node.js to use Google/Cloudflare public DNS to resolve MongoDB Atlas SRV records on Windows/ISPs
-try {
-  dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
-} catch {
-  // Ignore if custom DNS cannot be set
+declare global {
+  // eslint-disable-next-line no-var
+  var mongooseCache:
+    | {
+        conn: typeof mongoose | null;
+        promise: Promise<typeof mongoose> | null;
+      }
+    | undefined;
 }
 
-export const connectDB = async (): Promise<typeof mongoose> => {
+// Custom DNS helps Atlas SRV resolution on some local Windows/ISP networks only.
+if (!process.env.VERCEL) {
   try {
-    const connStr = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/portfolio_db';
-    const conn = await mongoose.connect(connStr);
-    console.log(`[MongoDB Connected]: ${conn.connection.host} / ${conn.connection.name}`);
-    return conn;
-  } catch (error) {
-    console.error(`[MongoDB Connection Error]: ${(error as Error).message}`);
-    console.error(
-      `\n⚠️ MongoDB Atlas Connection Tips:\n` +
-      ` 1. Network Access (IP Whitelist): Log in to MongoDB Atlas -> Network Access -> Add IP Address -> Allow Access From Anywhere (0.0.0.0/0).\n` +
-      ` 2. Local MongoDB Alternative: If offline or testing locally, change MONGODB_URI in backend/.env to:\n` +
-      `    MONGODB_URI=mongodb://127.0.0.1:27017/portfolio_db\n`
-    );
-    throw error;
+    dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
+  } catch {
+    // Ignore if custom DNS cannot be set
   }
+}
+
+const getMongoUri = (): string => {
+  const uri = process.env.MONGODB_URI?.trim();
+  if (!uri) {
+    throw new Error(
+      'MONGODB_URI is not configured. Add it to Vercel project Environment Variables.'
+    );
+  }
+  return uri;
 };
+
+export const connectDB = async (): Promise<typeof mongoose> => {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose;
+  }
+
+  const cached = global.mongooseCache ?? { conn: null, promise: null };
+  global.mongooseCache = cached;
+
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const connStr = getMongoUri();
+
+    cached.promise = mongoose
+      .connect(connStr, {
+        bufferCommands: false,
+        serverSelectionTimeoutMS: 10000,
+        socketTimeoutMS: 45000,
+        maxPoolSize: 10,
+      })
+      .then((conn) => {
+        console.log(
+          `[MongoDB Connected]: ${conn.connection.host} / ${conn.connection.name}`
+        );
+        return conn;
+      })
+      .catch((error: Error) => {
+        cached.promise = null;
+        console.error(`[MongoDB Connection Error]: ${error.message}`);
+        console.error(
+          `\nMongoDB Atlas checklist:\n` +
+            ` 1. Network Access: allow 0.0.0.0/0 (or Vercel IPs).\n` +
+            ` 2. Vercel env: set MONGODB_URI with your Atlas connection string.\n` +
+            ` 3. Include a database name, e.g. ...mongodb.net/portfolio_db?retryWrites=true\n`
+        );
+        throw error;
+      });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+};
+
+export const getDbStatus = () => ({
+  connected: mongoose.connection.readyState === 1,
+  readyState: mongoose.connection.readyState,
+  host: mongoose.connection.host || null,
+  name: mongoose.connection.name || null,
+});
