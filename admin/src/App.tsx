@@ -5,7 +5,6 @@ import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { AdminLayout } from './components/layout/AdminLayout';
-
 // Pages
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';

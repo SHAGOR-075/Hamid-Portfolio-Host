@@ -29,6 +29,8 @@ import {
 const STORAGE_KEYS = {
   USER: 'portfolio_admin_user',
   TOKEN: 'portfolio_admin_token',
+  REMEMBER: 'portfolio_admin_remember',
+  SAVED_EMAIL: 'portfolio_admin_saved_email',
   HOME: 'portfolio_admin_home',
   ABOUT: 'portfolio_admin_about',
   SKILLS: 'portfolio_admin_skills',
@@ -117,19 +119,60 @@ export const storage = {
   setUser: (user: User) => setStored(STORAGE_KEYS.USER, user),
 
   getToken: (): string | null => {
-    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
-    if (token === null) {
-      localStorage.setItem(STORAGE_KEYS.TOKEN, 'demo_session_token');
-      return 'demo_session_token';
+    const sessionToken = sessionStorage.getItem(STORAGE_KEYS.TOKEN);
+    if (sessionToken) return sessionToken;
+
+    const localToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
+    if (!localToken || localToken === 'demo_session_token') {
+      return null;
     }
-    return token === '' || token === 'null' ? null : token;
+
+    return localToken;
   },
-  setToken: (token: string | null) => {
-    if (token) {
-      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
-    } else {
-      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+
+  setToken: (token: string | null, remember = true) => {
+    sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.TOKEN);
+
+    if (!token) {
+      localStorage.removeItem(STORAGE_KEYS.REMEMBER);
+      return;
     }
+
+    if (remember) {
+      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      localStorage.setItem(STORAGE_KEYS.REMEMBER, 'true');
+      return;
+    }
+
+    sessionStorage.setItem(STORAGE_KEYS.TOKEN, token);
+    localStorage.removeItem(STORAGE_KEYS.REMEMBER);
+  },
+
+  getSavedEmail: (): string | null => {
+    if (localStorage.getItem(STORAGE_KEYS.REMEMBER) !== 'true') {
+      return null;
+    }
+
+    return localStorage.getItem(STORAGE_KEYS.SAVED_EMAIL);
+  },
+
+  setSavedEmail: (email: string) => {
+    localStorage.setItem(STORAGE_KEYS.SAVED_EMAIL, email);
+    localStorage.setItem(STORAGE_KEYS.REMEMBER, 'true');
+  },
+
+  clearSavedEmail: () => {
+    localStorage.removeItem(STORAGE_KEYS.SAVED_EMAIL);
+    localStorage.removeItem(STORAGE_KEYS.REMEMBER);
+  },
+
+  clearAuth: () => {
+    sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.REMEMBER);
+    localStorage.removeItem(STORAGE_KEYS.SAVED_EMAIL);
+    localStorage.removeItem('demo_session_token');
   },
 
   getHome: (): HomeData => getStored(STORAGE_KEYS.HOME, initialHomeData),

@@ -22,6 +22,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/utils';
 import { storage } from '../../services/storage';
+import { PwaInstallPrompt } from '../pwa/PwaInstallPrompt';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -218,6 +219,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <UserCheck className="w-5 h-5 shrink-0" />
                 {!isCollapsed && <span className="truncate">Admin Profile</span>}
               </NavLink>
+
+              <PwaInstallPrompt
+                variant="sidebar"
+                compact={isCollapsed}
+                onOpenChange={(open) => open && onCloseMobile()}
+              />
 
               <button
                 type="button"

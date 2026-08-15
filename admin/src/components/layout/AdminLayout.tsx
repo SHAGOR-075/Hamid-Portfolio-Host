@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
+import { PwaInstallBanner } from '../pwa/PwaInstallBanner';
 
 export const AdminLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState<boolean>(false);
@@ -35,6 +36,7 @@ export const AdminLayout: React.FC = () => {
         }`}
       >
         <div className="max-w-7xl mx-auto">
+          <PwaInstallBanner />
           <Outlet />
         </div>
       </main>

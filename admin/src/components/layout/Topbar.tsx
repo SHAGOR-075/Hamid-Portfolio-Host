@@ -13,7 +13,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { storage } from '../../services/storage';
-import { PwaInstallButton } from '../pwa/PwaInstallButton';
+import { PwaInstallPrompt } from '../pwa/PwaInstallPrompt';
 
 interface TopbarProps {
   onToggleMobileSidebar: () => void;
@@ -87,7 +87,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleMobileSidebar, collapsed
 
       {/* Right side controls */}
       <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-        <PwaInstallButton />
+        <PwaInstallPrompt />
 
         {/* Preview Website Button */}
         <button

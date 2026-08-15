@@ -27,7 +27,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      storage.setToken(null);
+      storage.clearAuth();
     }
     return Promise.reject(error);
   }

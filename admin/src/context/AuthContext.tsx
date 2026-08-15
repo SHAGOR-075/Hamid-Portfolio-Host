@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
 import { authService, LoginCredentials } from '../services/authService';
+import { storage } from '../services/storage';
 import toast from 'react-hot-toast';
 
 interface AuthContextType {
@@ -23,9 +24,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        if (localStorage.getItem('portfolio_admin_token') === 'demo_session_token') {
+          storage.clearAuth();
+          setUser(null);
+          return;
+        }
+
         const currentUser = await authService.getCurrentUser();
         setUser(currentUser);
       } catch {
+        storage.clearAuth();
         setUser(null);
       } finally {
         setIsLoading(false);
