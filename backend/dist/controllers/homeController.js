@@ -10,7 +10,7 @@ const Home_1 = require("../models/Home");
 // @route   GET /api/home
 // @access  Public
 exports.getHomeData = (0, express_async_handler_1.default)(async (req, res) => {
-    let homeData = await Home_1.Home.findOne();
+    let homeData = await Home_1.Home.findOne().lean();
     if (!homeData) {
         res.status(404);
         throw new Error('Home data not found');

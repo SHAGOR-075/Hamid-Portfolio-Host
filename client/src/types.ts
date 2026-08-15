@@ -17,6 +17,7 @@ export interface ProfileData {
     quote: string;
   };
   profileImage: string;
+  heroImage?: string;
   aboutImage: string;
   stats: Array<{
     value: string;

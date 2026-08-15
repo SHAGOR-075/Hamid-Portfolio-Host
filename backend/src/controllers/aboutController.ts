@@ -6,7 +6,7 @@ import { About } from '../models/About';
 // @route   GET /api/about
 // @access  Public
 export const getAboutData = asyncHandler(async (req: Request, res: Response) => {
-  const aboutData = await About.findOne();
+  const aboutData = await About.findOne().lean();
   if (!aboutData) {
     res.status(404);
     throw new Error('About data not found');

@@ -6,6 +6,17 @@ import { travelData as defaultTravel } from '../data/travelData';
 import { SkillItem, EducationItem, MLProjectItem, TravelDestination } from '../types';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL || 'https://hamid-portfolio-backend.vercel.app/api';
+const CACHE_KEY = 'portfolio_client_data_swr_v1';
+
+interface DataCachePayload {
+  profile: typeof defaultProfile;
+  skills: SkillItem[];
+  education: EducationItem[];
+  projects: MLProjectItem[];
+  travel: TravelDestination[];
+  socials: typeof defaultSocials;
+  timestamp: number;
+}
 
 interface DataContextType {
   profile: typeof defaultProfile;
@@ -21,19 +32,35 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
+// Helper to read initial cache from LocalStorage for 0ms SWR instant paint
+function readInitialCache(): DataCachePayload | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (raw) {
+      return JSON.parse(raw) as DataCachePayload;
+    }
+  } catch {
+    // Ignore storage parse errors
+  }
+  return null;
+}
+
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [profile, setProfile] = useState(defaultProfile);
-  const [skills, setSkills] = useState<SkillItem[]>(defaultSkills);
-  const [education, setEducation] = useState<EducationItem[]>(defaultEducation);
-  const [projects, setProjects] = useState<MLProjectItem[]>(defaultProjects);
-  const [travel, setTravel] = useState<TravelDestination[]>(defaultTravel);
-  const [socials, setSocials] = useState(defaultSocials);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLive, setIsLive] = useState(false);
+  const initialCache = readInitialCache();
+
+  const [profile, setProfile] = useState(initialCache?.profile || defaultProfile);
+  const [skills, setSkills] = useState<SkillItem[]>(initialCache?.skills || defaultSkills);
+  const [education, setEducation] = useState<EducationItem[]>(initialCache?.education || defaultEducation);
+  const [projects, setProjects] = useState<MLProjectItem[]>(initialCache?.projects || defaultProjects);
+  const [travel, setTravel] = useState<TravelDestination[]>(initialCache?.travel || defaultTravel);
+  const [socials, setSocials] = useState(initialCache?.socials || defaultSocials);
+
+  // If we have cached data, start with isLoading = false immediately (0ms paint!)
+  const [isLoading, setIsLoading] = useState(!initialCache);
+  const [isLive, setIsLive] = useState(Boolean(initialCache));
 
   const fetchData = async () => {
     try {
-      // Fetch Home & About to populate profile
       const [homeRes, aboutRes, skillsRes, eduRes, projRes, trvRes, socRes, contactRes] = await Promise.allSettled([
         fetch(`${API_BASE}/home`).then((r) => (r.ok ? r.json() : null)),
         fetch(`${API_BASE}/about`).then((r) => (r.ok ? r.json() : null)),
@@ -47,6 +74,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       let liveDetected = false;
 
+      // Temporary variables for caching
+      let nextProfile = profile;
+      let nextSkills = skills;
+      let nextEdu = education;
+      let nextProjects = projects;
+      let nextTravel = travel;
+      let nextSocials = socials;
+
       // Map Profile Data
       const home = homeRes.status === 'fulfilled' ? homeRes.value : null;
       const about = aboutRes.status === 'fulfilled' ? aboutRes.value : null;
@@ -54,35 +89,40 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (home || about || contact) {
         liveDetected = true;
-        setProfile((prev) => ({
-          ...prev,
-          name: home?.name ? home.name.split(' ')[0] : prev.name,
-          fullName: home?.name || prev.fullName,
-          badge: home?.badge || prev.badge,
-          title: home?.heading || prev.title,
-          subtitle: home?.description || prev.subtitle,
-          location: home?.location || prev.location,
-          cityCountry: home?.location || prev.cityCountry,
-          availability: home?.availability || contact?.availability || prev.availability,
-          profileImage: about?.profileImage || home?.heroImage || prev.profileImage,
-          aboutImage: about?.profileImage || prev.aboutImage,
-          email: contact?.email || prev.email,
-          phone: contact?.phone || prev.phone,
-          bio: {
-            ...prev.bio,
-            intro: about?.description || prev.bio.intro,
-            body1: about?.paragraphs?.[0] || prev.bio.body1,
-            body2: about?.paragraphs?.[1] || prev.bio.body2,
-            quote: about?.paragraphs?.[2] || prev.bio.quote,
-          },
-          stats: about?.stats?.length
-            ? about.stats.map((s: any) => ({
-                value: s.value,
-                label: s.label,
-                sublabel: s.label,
-              }))
-            : prev.stats,
-        }));
+        setProfile((prev) => {
+          const updated = {
+            ...prev,
+            name: home?.name ? home.name.split(' ')[0] : prev.name,
+            fullName: home?.name || prev.fullName,
+            badge: home?.badge || prev.badge,
+            title: home?.heading || prev.title,
+            subtitle: home?.description || prev.subtitle,
+            location: home?.location || prev.location,
+            cityCountry: home?.location || prev.cityCountry,
+            availability: home?.availability || contact?.availability || prev.availability,
+            profileImage: home?.heroImage || prev.profileImage,
+            heroImage: home?.heroImage || prev.heroImage || prev.profileImage,
+            aboutImage: about?.profileImage || prev.aboutImage,
+            email: contact?.email || prev.email,
+            phone: contact?.phone || prev.phone,
+            bio: {
+              ...prev.bio,
+              intro: about?.description || prev.bio.intro,
+              body1: about?.paragraphs?.[0] || prev.bio.body1,
+              body2: about?.paragraphs?.[1] || prev.bio.body2,
+              quote: about?.paragraphs?.[2] || prev.bio.quote,
+            },
+            stats: about?.stats?.length
+              ? about.stats.map((s: any) => ({
+                  value: s.value,
+                  label: s.label,
+                  sublabel: s.label,
+                }))
+              : prev.stats,
+          };
+          nextProfile = updated;
+          return updated;
+        });
       }
 
       // Map Skills
@@ -104,6 +144,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
             popular: s.level >= 90,
           };
         });
+        nextSkills = mappedSkills;
         setSkills(mappedSkills);
       }
 
@@ -126,6 +167,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           coursework: [],
           achievements: e.achievement ? [e.achievement] : [],
         }));
+        nextEdu = mappedEdu;
         setEducation(mappedEdu);
       }
 
@@ -149,6 +191,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           features: p.features || [],
           architectureOverview: p.architectureOverview || '',
         }));
+        nextProjects = mappedProjects;
         setProjects(mappedProjects);
       }
 
@@ -167,6 +210,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           highlight: t.location,
           storyQuote: t.longDescription || t.shortDescription,
         }));
+        nextTravel = mappedTravel;
         setTravel(mappedTravel);
       }
 
@@ -183,12 +227,29 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (key.includes('youtube')) socMap.youtube = s.url;
           if (key.includes('facebook')) socMap.facebook = s.url;
         });
+        nextSocials = socMap;
         setSocials(socMap);
       }
 
       setIsLive(liveDetected);
+
+      // Save fresh data to SWR LocalStorage Cache
+      try {
+        const payloadToCache: DataCachePayload = {
+          profile: nextProfile,
+          skills: nextSkills,
+          education: nextEdu,
+          projects: nextProjects,
+          travel: nextTravel,
+          socials: nextSocials,
+          timestamp: Date.now(),
+        };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(payloadToCache));
+      } catch {
+        // Ignore quota errors
+      }
     } catch {
-      // Keep static defaults
+      // Keep static or cached defaults
     } finally {
       setIsLoading(false);
     }
@@ -197,12 +258,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     fetchData();
 
-    // Re-fetch automatically when window gets focus or every 10 seconds
+    // Re-fetch automatically when window gets focus or every 30 seconds
     const onFocus = () => fetchData();
     window.addEventListener('focus', onFocus);
     const interval = setInterval(() => {
       fetchData();
-    }, 10000);
+    }, 30000);
 
     return () => {
       window.removeEventListener('focus', onFocus);

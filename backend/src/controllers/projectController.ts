@@ -7,7 +7,7 @@ import { buildIdQuery } from '../utils/buildIdQuery';
 // @route   GET /api/projects
 // @access  Public
 export const getProjects = asyncHandler(async (req: Request, res: Response) => {
-  const projects = await Project.find().sort({ order: 1 });
+  const projects = await Project.find().sort({ order: 1 }).lean();
   res.json(projects);
 });
 
@@ -16,7 +16,7 @@ export const getProjects = asyncHandler(async (req: Request, res: Response) => {
 // @access  Public
 export const getProjectByIdOrSlug = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const project = await Project.findOne(buildIdQuery(id)) || await Project.findOne({ slug: id });
+  const project = await Project.findOne(buildIdQuery(id)).lean() || await Project.findOne({ slug: id }).lean();
 
   if (!project) {
     res.status(404);

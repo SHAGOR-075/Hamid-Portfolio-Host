@@ -11,7 +11,7 @@ const buildIdQuery_1 = require("../utils/buildIdQuery");
 // @route   GET /api/travel
 // @access  Public
 exports.getTravelPosts = (0, express_async_handler_1.default)(async (req, res) => {
-    const posts = await Travel_1.Travel.find().sort({ order: 1 });
+    const posts = await Travel_1.Travel.find().sort({ order: 1 }).lean();
     res.json(posts);
 });
 // @desc    Get single travel post

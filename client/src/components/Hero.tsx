@@ -150,7 +150,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
               <div className="relative w-64 sm:w-80 md:w-88 aspect-[4/5] rounded-3xl p-3 bg-neutral-900/60 dark:bg-[#0B0F0D] light:bg-neutral-100 border border-neutral-800/80 dark:border-neutral-800/80 light:border-neutral-200 shadow-2xl overflow-hidden">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden bg-neutral-950">
                   <img
-                    src={profileData.profileImage}
+                    src={profileData.heroImage || profileData.profileImage}
                     alt={profileData.fullName}
                     className="w-full h-full object-cover object-center grayscale hover:grayscale-0 transition-all duration-700 scale-105 hover:scale-100"
                     loading="eager"

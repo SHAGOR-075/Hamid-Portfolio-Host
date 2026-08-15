@@ -36,19 +36,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Project = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const ProjectSchema = new mongoose_1.Schema({
-    customId: { type: String, required: true, unique: true },
+    customId: { type: String, required: true, unique: true, index: true },
     title: { type: String, required: true },
-    slug: { type: String, required: true },
+    slug: { type: String, required: true, index: true },
     shortDescription: { type: String, required: true },
     description: { type: String, required: true },
-    category: { type: String, required: true },
+    category: { type: String, required: true, index: true },
     image: { type: String, required: true },
     technologies: [{ type: String }],
     githubUrl: { type: String, default: '' },
     liveUrl: { type: String, default: '' },
-    featured: { type: Boolean, default: false },
-    order: { type: Number, default: 0 },
-    active: { type: Boolean, default: true },
+    featured: { type: Boolean, default: false, index: true },
+    order: { type: Number, default: 0, index: true },
+    active: { type: Boolean, default: true, index: true },
     metrics: [
         {
             label: { type: String },
@@ -58,4 +58,6 @@ const ProjectSchema = new mongoose_1.Schema({
     features: [{ type: String }],
     architectureOverview: { type: String, default: '' },
 }, { timestamps: true });
+ProjectSchema.index({ featured: -1, order: 1 });
+ProjectSchema.index({ active: 1, order: 1 });
 exports.Project = mongoose_1.default.model('Project', ProjectSchema);

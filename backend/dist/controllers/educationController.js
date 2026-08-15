@@ -11,7 +11,7 @@ const buildIdQuery_1 = require("../utils/buildIdQuery");
 // @route   GET /api/education
 // @access  Public
 exports.getEducation = (0, express_async_handler_1.default)(async (req, res) => {
-    const education = await Education_1.Education.find().sort({ order: 1 });
+    const education = await Education_1.Education.find().sort({ order: 1 }).lean();
     res.json(education);
 });
 // @desc    Create education item

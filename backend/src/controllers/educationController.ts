@@ -7,7 +7,7 @@ import { buildIdQuery } from '../utils/buildIdQuery';
 // @route   GET /api/education
 // @access  Public
 export const getEducation = asyncHandler(async (req: Request, res: Response) => {
-  const education = await Education.find().sort({ order: 1 });
+  const education = await Education.find().sort({ order: 1 }).lean();
   res.json(education);
 });
 

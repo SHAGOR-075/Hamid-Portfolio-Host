@@ -7,7 +7,7 @@ import { buildIdQuery } from '../utils/buildIdQuery';
 // @route   GET /api/socials
 // @access  Public
 export const getSocialLinks = asyncHandler(async (req: Request, res: Response) => {
-  const socials = await Social.find().sort({ order: 1 });
+  const socials = await Social.find().sort({ order: 1 }).lean();
   res.json(socials);
 });
 

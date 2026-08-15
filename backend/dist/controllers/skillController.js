@@ -11,7 +11,7 @@ const buildIdQuery_1 = require("../utils/buildIdQuery");
 // @route   GET /api/skills
 // @access  Public
 exports.getSkills = (0, express_async_handler_1.default)(async (req, res) => {
-    const skills = await Skill_1.Skill.find().sort({ order: 1 });
+    const skills = await Skill_1.Skill.find().sort({ order: 1 }).lean();
     res.json(skills);
 });
 // @desc    Create new skill

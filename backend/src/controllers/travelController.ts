@@ -7,7 +7,7 @@ import { buildIdQuery } from '../utils/buildIdQuery';
 // @route   GET /api/travel
 // @access  Public
 export const getTravelPosts = asyncHandler(async (req: Request, res: Response) => {
-  const posts = await Travel.find().sort({ order: 1 });
+  const posts = await Travel.find().sort({ order: 1 }).lean();
   res.json(posts);
 });
 

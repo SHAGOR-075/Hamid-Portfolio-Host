@@ -11,7 +11,7 @@ const buildIdQuery_1 = require("../utils/buildIdQuery");
 // @route   GET /api/socials
 // @access  Public
 exports.getSocialLinks = (0, express_async_handler_1.default)(async (req, res) => {
-    const socials = await Social_1.Social.find().sort({ order: 1 });
+    const socials = await Social_1.Social.find().sort({ order: 1 }).lean();
     res.json(socials);
 });
 // @desc    Create social link

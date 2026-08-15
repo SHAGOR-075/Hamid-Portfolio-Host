@@ -10,7 +10,7 @@ const About_1 = require("../models/About");
 // @route   GET /api/about
 // @access  Public
 exports.getAboutData = (0, express_async_handler_1.default)(async (req, res) => {
-    const aboutData = await About_1.About.findOne();
+    const aboutData = await About_1.About.findOne().lean();
     if (!aboutData) {
         res.status(404);
         throw new Error('About data not found');

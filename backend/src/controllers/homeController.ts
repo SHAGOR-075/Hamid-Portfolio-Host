@@ -6,7 +6,7 @@ import { Home } from '../models/Home';
 // @route   GET /api/home
 // @access  Public
 export const getHomeData = asyncHandler(async (req: Request, res: Response) => {
-  let homeData = await Home.findOne();
+  let homeData = await Home.findOne().lean();
   if (!homeData) {
     res.status(404);
     throw new Error('Home data not found');

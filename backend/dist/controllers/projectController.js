@@ -11,7 +11,7 @@ const buildIdQuery_1 = require("../utils/buildIdQuery");
 // @route   GET /api/projects
 // @access  Public
 exports.getProjects = (0, express_async_handler_1.default)(async (req, res) => {
-    const projects = await Project_1.Project.find().sort({ order: 1 });
+    const projects = await Project_1.Project.find().sort({ order: 1 }).lean();
     res.json(projects);
 });
 // @desc    Get single project by ID or Slug
@@ -19,7 +19,7 @@ exports.getProjects = (0, express_async_handler_1.default)(async (req, res) => {
 // @access  Public
 exports.getProjectByIdOrSlug = (0, express_async_handler_1.default)(async (req, res) => {
     const { id } = req.params;
-    const project = await Project_1.Project.findOne((0, buildIdQuery_1.buildIdQuery)(id)) || await Project_1.Project.findOne({ slug: id });
+    const project = await Project_1.Project.findOne((0, buildIdQuery_1.buildIdQuery)(id)).lean() || await Project_1.Project.findOne({ slug: id }).lean();
     if (!project) {
         res.status(404);
         throw new Error('Project not found');

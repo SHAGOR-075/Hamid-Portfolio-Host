@@ -36,13 +36,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Skill = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const SkillSchema = new mongoose_1.Schema({
-    customId: { type: String, required: true, unique: true },
+    customId: { type: String, required: true, unique: true, index: true },
     name: { type: String, required: true },
-    category: { type: String, required: true },
+    category: { type: String, required: true, index: true },
     icon: { type: String, required: true },
     description: { type: String },
     level: { type: Number, default: 80, min: 0, max: 100 },
-    order: { type: Number, default: 0 },
-    active: { type: Boolean, default: true },
+    order: { type: Number, default: 0, index: true },
+    active: { type: Boolean, default: true, index: true },
 }, { timestamps: true });
+SkillSchema.index({ active: 1, order: 1 });
 exports.Skill = mongoose_1.default.model('Skill', SkillSchema);

@@ -7,7 +7,7 @@ import { buildIdQuery } from '../utils/buildIdQuery';
 // @route   GET /api/skills
 // @access  Public
 export const getSkills = asyncHandler(async (req: Request, res: Response) => {
-  const skills = await Skill.find().sort({ order: 1 });
+  const skills = await Skill.find().sort({ order: 1 }).lean();
   res.json(skills);
 });
 

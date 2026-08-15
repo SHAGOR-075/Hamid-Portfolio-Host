@@ -18,9 +18,9 @@ export const profileData: ProfileData = {
     body2: "When I'm away from code and research papers, you will likely find me trekking through remote mountain ridges, exploring coastal shores, or documenting stories from the road. Travel keeps my perspective fresh, curious, and grounded.",
     quote: "Building with code by day, learning through data, and wandering into uncharted landscapes whenever the opportunity arises."
   },
-  // High quality professional representation
-  profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=85",
-  aboutImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=85",
+  profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=85",
+  heroImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=85",
+  aboutImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=85",
   stats: [
     {
       value: "01+",
