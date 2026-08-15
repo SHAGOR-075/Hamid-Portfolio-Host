@@ -120,7 +120,7 @@ export const HomeManagement: React.FC = () => {
               label="Full Name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g. Shagor Ahmed"
+              placeholder="e.g. Abdul Hamid Khokon"
               required
             />
             <Input

@@ -21,8 +21,8 @@ export const ProfileManagement: React.FC = () => {
   const { user, updateProfile, changePassword } = useAuth();
 
   // Profile info state
-  const [name, setName] = useState(user?.name || 'Shagor Ahmed');
-  const [email, setEmail] = useState(user?.email || 'admin@shagorahmed.dev');
+  const [name, setName] = useState(user?.name || 'Abdul Hamid Khokon');
+  const [email, setEmail] = useState(user?.email || 'hamidkhokon8@gmail.com');
   const [avatar, setAvatar] = useState(
     user?.avatar ||
       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'
@@ -109,7 +109,7 @@ export const ProfileManagement: React.FC = () => {
               label="Display Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Shagor Ahmed"
+              placeholder="Abdul Hamid Khokon"
               required
             />
             <Input
@@ -117,7 +117,7 @@ export const ProfileManagement: React.FC = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@shagorahmed.dev"
+              placeholder="hamidkhokon8@gmail.com"
               required
             />
 

@@ -92,7 +92,7 @@ export const Dashboard: React.FC = () => {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => window.open(storage.getSettings().previewUrl || 'https://shagorahmed.dev', '_blank')}
+              onClick={() => window.open(storage.getSettings().previewUrl || (import.meta as any).env?.VITE_PREVIEW_URL || 'https://hamidkhokon.sites.bd', '_blank')}
               rightIcon={<ExternalLink className="w-4 h-4" />}
               className="w-full xs:w-auto justify-center"
             >

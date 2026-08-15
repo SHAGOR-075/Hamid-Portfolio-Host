@@ -128,7 +128,7 @@ export const SettingsManagement: React.FC = () => {
               label="Website Title"
               value={settings.siteTitle}
               onChange={(e) => setSettings({ ...settings, siteTitle: e.target.value })}
-              placeholder="Shagor Ahmed | Machine Learning & CSE Portfolio"
+              placeholder="Abdul Hamid Khokon | Machine Learning & CSE Portfolio"
               required
             />
             <Input
@@ -143,7 +143,7 @@ export const SettingsManagement: React.FC = () => {
             label="Meta Description (Search Snippet)"
             value={settings.metaDescription}
             onChange={(e) => setSettings({ ...settings, metaDescription: e.target.value })}
-            placeholder="Official portfolio of Shagor Ahmed, Computer Science graduate specializing in ML..."
+            placeholder="Official portfolio of Abdul Hamid Khokon, Computer Science graduate specializing in ML..."
             rows={2}
           />
 

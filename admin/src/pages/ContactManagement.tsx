@@ -154,7 +154,7 @@ export const ContactManagement: React.FC = () => {
                 type="email"
                 value={contactInfo.email}
                 onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
-                placeholder="shagor.cse.ml@gmail.com"
+                placeholder="hamidkhokon8@gmail.com"
                 leftIcon={<Mail className="w-4 h-4" />}
                 required
               />

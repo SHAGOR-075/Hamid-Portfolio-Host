@@ -254,14 +254,14 @@ export const ProjectFormPage: React.FC = () => {
               label="GitHub Repository URL"
               value={formData.githubUrl || ''}
               onChange={(e) => setFormData({ ...formData, githubUrl: e.target.value })}
-              placeholder="https://github.com/shagorahmed/project-repo"
+              placeholder=""
               leftIcon={<Github className="w-4 h-4" />}
             />
             <Input
               label="Live Production Demo URL"
               value={formData.liveUrl || ''}
               onChange={(e) => setFormData({ ...formData, liveUrl: e.target.value })}
-              placeholder="https://demo.shagorahmed.dev"
+              placeholder="https://hamidkhokon.sites.bd"
               leftIcon={<Globe className="w-4 h-4" />}
             />
           </div>

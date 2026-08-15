@@ -22,6 +22,6 @@ export const connectDB = async (): Promise<typeof mongoose> => {
       ` 2. Local MongoDB Alternative: If offline or testing locally, change MONGODB_URI in backend/.env to:\n` +
       `    MONGODB_URI=mongodb://127.0.0.1:27017/portfolio_db\n`
     );
-    process.exit(1);
+    throw error;
   }
 };

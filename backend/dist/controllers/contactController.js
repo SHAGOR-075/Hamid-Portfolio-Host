@@ -51,23 +51,26 @@ exports.submitContactMessage = (0, express_async_handler_1.default)(async (req, 
     const customId = `msg_${Date.now()}`;
     const newMessage = await ContactMessage_1.ContactMessage.create({
         customId,
-        name,
+        name: name.trim(),
         email: email.trim(),
-        subject,
-        message,
+        subject: subject.trim(),
+        message: message.trim(),
         status: 'unread',
         starred: false,
     });
-    // Asynchronously dispatch notification email to admin/owner
-    (0, sendEmail_1.sendContactNotificationEmail)({
-        name,
+    const emailSent = await (0, sendEmail_1.sendContactNotificationEmail)({
+        name: name.trim(),
         email: email.trim(),
-        subject,
-        message,
-    }).catch((err) => {
-        console.error('[Email Dispatch Warning]: Background mail notification error:', err);
+        subject: subject.trim(),
+        message: message.trim(),
     });
-    res.status(201).json(newMessage);
+    res.status(201).json({
+        ...newMessage.toObject(),
+        emailSent,
+        message: emailSent
+            ? 'Message received and email notification sent successfully.'
+            : 'Message received. Email notification could not be sent right now.',
+    });
 });
 // @desc    Get all contact messages
 // @route   GET /api/contact/messages

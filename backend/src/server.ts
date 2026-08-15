@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { connectDB } from './config/db';
+import { getEmailConfigStatus } from './utils/sendEmail';
 import { notFound, errorHandler } from './middleware/error';
 import { User } from './models/User';
 import { seedDatabase } from './utils/seeder';
@@ -76,6 +77,7 @@ app.get('/api/health', (req: Request, res: Response) => {
     status: 'OK',
     message: 'Abdul Hamid Khokon Portfolio REST API Server Running',
     timestamp: new Date().toISOString(),
+    email: getEmailConfigStatus(),
   });
 });
 

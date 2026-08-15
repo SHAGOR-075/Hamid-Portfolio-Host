@@ -384,7 +384,7 @@ export const SocialsManagement: React.FC = () => {
               label="Username / Handle"
               value={socialForm.username || ''}
               onChange={(e) => setSocialForm({ ...socialForm, username: e.target.value })}
-              placeholder="@shagorahmed"
+              placeholder="@abdulhamidkhokon"
             />
             <Input
               label="Icon Identifier"

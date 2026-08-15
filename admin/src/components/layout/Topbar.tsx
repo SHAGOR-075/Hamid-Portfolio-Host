@@ -51,7 +51,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onToggleMobileSidebar, collapsed
   };
 
   const handlePreview = () => {
-    window.open(settings.previewUrl || (import.meta as any).env?.VITE_PREVIEW_URL || 'http://hamidkhokon.sites.bd', '_blank', 'noopener,noreferrer');
+    window.open(settings.previewUrl || (import.meta as any).env?.VITE_PREVIEW_URL || 'https://hamidkhokon.sites.bd', '_blank', 'noopener,noreferrer');
   };
 
   const handleLogout = async () => {

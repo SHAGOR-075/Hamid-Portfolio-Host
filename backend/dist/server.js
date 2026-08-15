@@ -9,6 +9,7 @@ const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 const db_1 = require("./config/db");
+const sendEmail_1 = require("./utils/sendEmail");
 const error_1 = require("./middleware/error");
 const User_1 = require("./models/User");
 const seeder_1 = require("./utils/seeder");
@@ -71,6 +72,7 @@ app.get('/api/health', (req, res) => {
         status: 'OK',
         message: 'Abdul Hamid Khokon Portfolio REST API Server Running',
         timestamp: new Date().toISOString(),
+        email: (0, sendEmail_1.getEmailConfigStatus)(),
     });
 });
 // API Routes

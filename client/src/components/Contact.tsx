@@ -29,6 +29,8 @@ export const Contact: React.FC = () => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [emailNotificationSent, setEmailNotificationSent] = useState(false);
 
   const {
     register,
@@ -45,33 +47,46 @@ export const Contact: React.FC = () => {
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
+    setSubmitError(null);
+    setIsSubmitted(false);
 
     const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL || 'https://hamid-portfolio-backend.vercel.app/api';
 
     try {
-      await fetch(`${API_BASE}/contact/messages`, {
+      const response = await fetch(`${API_BASE}/contact/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-    } catch {
-      // Fallback gracefully if backend API is not running
-    }
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    reset();
+      const result = await response.json().catch(() => ({}));
 
-    // Trigger green & gold celebratory confetti
-    try {
-      confetti({
-        particleCount: 70,
-        spread: 60,
-        origin: { y: 0.7 },
-        colors: ['#10B981', '#063B2A', '#34D399', '#A7F3D0']
-      });
-    } catch {
-      // Fallback gracefully
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to send your message. Please try again.');
+      }
+
+      setIsSubmitted(true);
+      setEmailNotificationSent(Boolean(result.emailSent));
+      reset();
+
+      try {
+        confetti({
+          particleCount: 70,
+          spread: 60,
+          origin: { y: 0.7 },
+          colors: ['#10B981', '#063B2A', '#34D399', '#A7F3D0']
+        });
+      } catch {
+        // Fallback gracefully
+      }
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : 'Unable to send your message right now. Please try again later.'
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -284,6 +299,12 @@ export const Contact: React.FC = () => {
                 </button>
               </form>
 
+              {submitError && (
+                <div className="mt-5 p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-100 text-xs">
+                  {submitError}
+                </div>
+              )}
+
               {/* Animated Success Toast */}
               <AnimatePresence>
                 {isSubmitted && (
@@ -297,8 +318,12 @@ export const Contact: React.FC = () => {
                       <CheckCircle2 size={18} />
                     </div>
                     <div className="text-left text-xs">
-                      <p className="font-bold text-white text-sm">Thanks! Your message is ready to be sent.</p>
-                      <p className="text-emerald-200/90 mt-0.5">I will review your inquiry and get back to you promptly.</p>
+                      <p className="font-bold text-white text-sm">Thanks! Your message was sent successfully.</p>
+                      <p className="text-emerald-200/90 mt-0.5">
+                        {emailNotificationSent
+                          ? 'I received your inquiry by email and will get back to you soon.'
+                          : 'Your message was saved. I will review it and get back to you soon.'}
+                      </p>
                     </div>
                   </motion.div>
                 )}
